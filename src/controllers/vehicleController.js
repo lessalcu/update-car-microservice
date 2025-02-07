@@ -1,23 +1,28 @@
+require('dotenv').config();
 const db = require('../config/db');
+const request = require('request-promise');
 
-// Actualizar vehículo
+const QUERY_CAR_URL = process.env.QUERY_CAR_URL;
+
+
 exports.updateVehicle = async (req, res) => {
-    const { id } = req.params; // ID del vehículo a actualizar
+    const { id } = req.params;
     const { licensePlate, brand, model, color } = req.body;
 
-    // Validar campos
     if (!licensePlate || !brand || !model || !color) {
         return res.status(400).json({ message: "All fields are required" });
     }
 
     try {
-        // Verificar si el vehículo existe
-        const [vehicle] = await db.execute('SELECT * FROM Cars WHERE id = ?', [id]);
-        if (vehicle.length === 0) {
+        const vehicle = await request({
+            uri: `${QUERY_CAR_URL}/${id}`,
+            json: true
+        });
+
+        if (!vehicle) {
             return res.status(404).json({ message: "Vehicle not found" });
         }
 
-        // Actualizar vehículo en la base de datos
         await db.execute(
             'UPDATE Cars SET licensePlate = ?, brand = ?, model = ?, color = ? WHERE id = ?',
             [licensePlate, brand, model, color, id]
