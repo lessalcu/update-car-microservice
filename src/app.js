@@ -15,6 +15,9 @@ app.use(express.json());
 // Rutas
 app.use('/api/vehicle', vehicleRoutes);
 
+// Configura el puerto 3001 si no está en .env
+const PORT = process.env.PORT || 3001;
+
 // Iniciar servidor
 app.listen(PORT, () => {
     console.log(`Update Vehicle microservice running on port ${PORT}`);
